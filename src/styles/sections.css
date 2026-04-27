@@ -1,0 +1,300 @@
+/* BWA-Zeilen und Drilldowns */
+.bw {
+  display: flex; justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.bw:last-child { border-bottom: none; }
+.bw.tt {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  border-top: 2px solid var(--border);
+  margin-top: 8px;
+  padding-top: 12px;
+  font-size: 15px;
+}
+.bw .vl { font-weight: 600; font-feature-settings: 'tnum'; }
+.ng { color: var(--red); }
+.ps { color: #00907a; }
+
+.bw-cat {
+  cursor: pointer;
+  transition: background .15s;
+  border-radius: 12px;
+  margin: 0 -8px;
+  padding: 10px 8px;
+}
+.bw-cat:hover { background: var(--red-bg); }
+.bw-cat .arr {
+  display: inline-block;
+  transition: transform .2s;
+  font-size: 10px;
+  margin-right: 6px;
+  color: var(--red);
+}
+.bw-cat.open .arr { transform: rotate(90deg); }
+.bw-cat .pct { font-size: 11px; color: #999; font-weight: 500; margin-left: 8px; }
+.bw-detail {
+  max-height: 0; overflow: hidden;
+  transition: max-height .35s ease;
+  margin: 0 0 0 20px;
+}
+.bw-detail.open { max-height: 800px; }
+.bw-sub {
+  display: flex; justify-content: space-between;
+  padding: 6px 0;
+  font-size: 12px;
+  color: #666;
+  border-bottom: 1px solid #f8f8f8;
+}
+.bw-sub:last-child { border-bottom: none; }
+.bw-sub .s-val { font-weight: 500; min-width: 80px; text-align: right; font-feature-settings: 'tnum'; }
+.bw-sub .s-pct { font-size: 10px; color: #aaa; min-width: 45px; text-align: right; }
+.bw-sub .s-name { flex: 1; }
+.bw-pbar {
+  height: 4px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  margin-top: 2px;
+  overflow: hidden;
+}
+.bw-pbar .fill { height: 100%; border-radius: 2px; transition: width .4s; }
+
+/* Cashflow */
+.cf-row {
+  display: flex; justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #f5f5f5;
+  gap: 8px;
+}
+.cf-row:last-child { border-bottom: none; }
+.cf-row.cf-t {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800; font-size: 14px;
+  border-top: 2px solid var(--border);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+/* Plan vs Ist */
+.pvi-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+}
+.pvi-title { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+.pvi-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.pvi-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+.pvi-row:last-child { border-bottom: none; }
+.pvi-month {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700; font-size: 12px;
+  color: var(--muted);
+  min-width: 36px;
+  text-transform: uppercase;
+}
+.pvi-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.pvi-bar { height: 16px; border-radius: 8px; position: relative; min-width: 2px; transition: width .4s; }
+.pvi-bar-plan { background: var(--blue); opacity: .25; }
+.pvi-bar-ist { background: var(--red); }
+.pvi-vals {
+  min-width: 180px;
+  display: flex; gap: 12px; align-items: center;
+  font-size: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-feature-settings: 'tnum';
+}
+.pvi-ist-val { font-weight: 800; color: var(--dark); }
+.pvi-plan-val { font-weight: 600; color: var(--blue); }
+.pvi-delta { font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 6px; }
+.pvi-legend {
+  display: flex; gap: 20px;
+  margin-top: 16px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--muted);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+.pvi-legend span { display: flex; align-items: center; gap: 5px; }
+.pvi-legend-dot { width: 12px; height: 8px; border-radius: 3px; display: inline-block; }
+
+/* Cumulative Chart */
+.cum-chart { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+.cum-title { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 12px; }
+
+/* Forecast */
+.fc-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.fc-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap; gap: 16px;
+}
+.fc-header-left h3 { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 900; color: var(--dark); margin-bottom: 4px; }
+.fc-header-left p { font-size: 12px; color: var(--muted); }
+.fc-kpis { display: flex; gap: 20px; flex-wrap: wrap; }
+.fc-kpi { text-align: center; min-width: 100px; }
+.fc-kpi-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.fc-kpi-val { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 900; font-feature-settings: 'tnum'; }
+.fc-kpi-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.fc-chart { position: relative; margin-bottom: 16px; }
+
+.fc-tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+.fc-tab {
+  padding: 6px 16px; border-radius: 100px;
+  border: 2px solid var(--border);
+  background: #fff; color: var(--muted);
+  font-size: 12px; font-weight: 500;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all .2s;
+}
+.fc-tab:hover { border-color: var(--red); color: var(--red); }
+.fc-tab.a { border-color: var(--red); background: var(--red-bg); color: var(--red); font-weight: 600; }
+
+.fc-month-grid {
+  display: grid; grid-template-columns: repeat(12, 1fr);
+  gap: 6px; margin-bottom: 16px;
+}
+.fc-month {
+  border-radius: 14px;
+  padding: 12px 6px;
+  text-align: center;
+  transition: all .2s;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+}
+.fc-month:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.fc-month.ist { background: var(--red-bg); border-color: rgba(192,59,53,.2); }
+.fc-month.plan { background: var(--blue-bg); border-color: rgba(59,130,246,.15); }
+.fc-month.current { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,59,53,.15); }
+
+.fc-month-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.fc-month-bar { height: 60px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 6px; }
+.fc-month-bar-inner { width: 70%; border-radius: 6px 6px 0 0; min-height: 4px; transition: height .6s; }
+.fc-month-val { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; font-feature-settings: 'tnum'; }
+.fc-month-delta { font-size: 9px; font-weight: 700; margin-top: 2px; padding: 1px 5px; border-radius: 4px; display: inline-block; }
+.fc-month-type { font-size: 8px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; margin-top: 4px; }
+.fc-divider { position: absolute; top: -8px; bottom: -8px; width: 3px; background: var(--red); border-radius: 2px; z-index: 1; }
+.fc-divider-label {
+  position: absolute; top: -20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9px; font-weight: 800;
+  color: var(--red); white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* Liquidität */
+.liq-wrap { margin-bottom: 28px; }
+.liq-level {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 0;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 4px;
+  overflow: hidden;
+  transition: all .3s;
+}
+.liq-level:last-child { margin-bottom: 0; }
+.liq-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background .2s;
+  user-select: none;
+}
+.liq-hdr:hover { background: var(--red-bg); }
+.liq-hdr-left { display: flex; align-items: center; gap: 14px; }
+.liq-icon {
+  width: 48px; height: 48px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.liq-hdr-info h4 { font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 800; color: var(--dark); margin-bottom: 2px; }
+.liq-hdr-info p { font-size: 12px; color: var(--muted); }
+.liq-hdr-val { text-align: right; }
+.liq-hdr-val .liq-amount { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; font-feature-settings: 'tnum'; }
+.liq-hdr-val .liq-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.liq-body { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+.liq-body.open { max-height: 600px; }
+.liq-body-inner { padding: 0 24px 20px; border-top: 1px solid var(--border); }
+.liq-detail-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 13px;
+}
+.liq-detail-row:last-child { border-bottom: none; }
+.liq-detail-name { display: flex; align-items: center; gap: 8px; }
+.liq-connector { width: 3px; height: 60px; margin: 0 auto; border-left: 3px dashed var(--border); }
+.liq-plus {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--red-bg); color: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px; font-weight: 900;
+  margin: 0 auto;
+}
+.liq-total {
+  background: linear-gradient(135deg, var(--red), var(--red-hover));
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 12px 40px rgba(192,59,53,.2);
+  margin-top: 4px;
+}
+.liq-total h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  opacity: .8;
+  margin-bottom: 8px;
+}
+.liq-total .liq-total-val {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 42px; font-weight: 900;
+  font-feature-settings: 'tnum';
+  letter-spacing: -.02em;
+}
+.liq-total .liq-total-sub { font-size: 13px; opacity: .7; margin-top: 8px; }
+.liq-bar-wrap {
+  height: 8px;
+  background: rgba(255,255,255,.15);
+  border-radius: 4px;
+  margin-top: 16px;
+  overflow: hidden;
+  display: flex;
+}
+.liq-bar-seg { height: 100%; transition: width .4s; }

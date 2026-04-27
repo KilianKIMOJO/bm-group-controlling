@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BM Group — Management Controlling</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/index.css">
+</head>
+<body>
+  <!-- Login-Screen -->
+  <div id="lo">
+    <div class="lb">
+      <h1>BM Group</h1>
+      <p>Management Controlling · Dashboard</p>
+      <button class="l-btn" id="loginBtn">
+        <svg viewBox="0 0 21 21" fill="none">
+          <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
+          <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
+          <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
+          <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
+        </svg>
+        Mit Microsoft anmelden
+      </button>
+      <p class="l-err" id="er" style="display:none"></p>
+    </div>
+  </div>
+
+  <!-- Loading-Screen -->
+  <div class="loading h" id="ld">
+    <div class="spinner"></div>
+    <p id="lt">Verbinde...</p>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="db">
+    <div class="mx">
+      <!-- Sidebar Navigation -->
+      <nav class="side-nav" id="sideNav">
+        <div class="nav-items" id="navItems">
+          <div class="nav-brand"><span class="nav-brand-text">BM</span></div>
+          <a class="nav-item active" href="#sec-kpi" data-section="sec-kpi"><span class="nav-icon">📊</span><span class="nav-label">Übersicht</span></a>
+          <a class="nav-item" href="#sec-forecast" data-section="sec-forecast"><span class="nav-icon">🔮</span><span class="nav-label">Jahresvorschau</span></a>
+          <a class="nav-item" href="#sec-planist" data-section="sec-planist"><span class="nav-icon">📈</span><span class="nav-label">Plan vs. Ist</span></a>
+          <a class="nav-item" href="#sec-ausl" data-section="sec-ausl"><span class="nav-icon">⚡</span><span class="nav-label">Auslastung</span></a>
+          <a class="nav-item" href="#sec-thera" data-section="sec-thera"><span class="nav-icon">👥</span><span class="nav-label">Therapeuten</span></a>
+          <a class="nav-item" href="#sec-kranken" data-section="sec-kranken"><span class="nav-icon">🤒</span><span class="nav-label">Krankenstand</span></a>
+          <a class="nav-item" href="#sec-bwa" data-section="sec-bwa"><span class="nav-icon">📋</span><span class="nav-label">BWA</span></a>
+          <a class="nav-item" href="#sec-cf" data-section="sec-cf"><span class="nav-icon">🏦</span><span class="nav-label">Cashflow</span></a>
+          <a class="nav-item" href="#sec-liq" data-section="sec-liq"><span class="nav-icon">💰</span><span class="nav-label">Liquidität</span></a>
+          <div class="nav-divider"></div>
+          <div class="nav-filters" id="navFilters">
+            <div class="nav-filter-group">
+              <div class="nav-filter-label">⏰ Zeitraum</div>
+              <div class="nav-filter-pills" id="navTimePills"></div>
+            </div>
+            <div class="nav-filter-group">
+              <div class="nav-filter-label">📍 Standort</div>
+              <div class="nav-filter-pills" id="navLocPills"></div>
+            </div>
+          </div>
+          <div class="nav-footer">
+            <span class="nav-label nav-ts" id="navTs"></span>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Header -->
+      <div class="hdr">
+        <div><h1><span>BM Group</span> Controlling</h1></div>
+        <div class="hdr-r">
+          <div class="hdr-badge" id="hb">YTD 2026</div>
+          <button class="hdr-btn" id="refreshBtn">↻ Aktualisieren</button>
+          <button class="hdr-btn" id="logoutBtn">Abmelden</button>
+        </div>
+      </div>
+
+      <!-- Filterleiste -->
+      <div class="flt" id="flt"></div>
+
+      <!-- Sektionen -->
+      <div id="sec-kpi"></div>
+      <div class="hero" id="hero"></div>
+
+      <div id="sec-forecast"></div>
+      <div class="st" data-toggle-section>🔮 Jahresvorschau 2026 · Rollierende Planung <span class="st-arrow">▼</span></div>
+      <div id="forecastDiv" class="sec-body" style="max-height:3000px"></div>
+
+      <div id="sec-planist"></div>
+      <div class="st" data-toggle-section>Plan vs. Ist · Monatsverlauf <span class="st-arrow">▼</span></div>
+      <div id="planVsIstDiv" class="sec-body" style="max-height:3000px"></div>
+
+      <div id="sec-ausl"></div>
+      <div class="st" data-toggle-section>Auslastung <span class="st-arrow">▼</span></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <button class="fb" id="auslPrev" style="padding:8px 14px">←</button>
+        <span id="auslKWTitle" style="font-family:Montserrat;font-size:16px;font-weight:800"></span>
+        <button class="fb" id="auslNext" style="padding:8px 14px">→</button>
+        <span id="auslKWInfo" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px" id="auslDiv"></div>
+
+      <div id="sec-thera"></div>
+      <div class="st" data-toggle-section>Therapeuten · Umsatz pro Stunde <span class="st-arrow">▼</span></div>
+      <div id="theraKpis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px"></div>
+      <div class="tc">
+        <div class="thd">
+          <h3 id="tht">Alle Therapeuten</h3>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span id="kwInfo" style="font-family:Montserrat;font-size:11px;font-weight:700;color:var(--red);background:var(--red-bg);padding:4px 12px;border-radius:100px;white-space:nowrap"></span>
+            <select class="ss" id="kwf"><option value="all">Alle KWs</option></select>
+            <select class="ss" id="so">
+              <option value="ud">€/h ↓</option>
+              <option value="ua">€/h ↑</option>
+              <option value="u">Umsatz ↓</option>
+              <option value="b">Behandlungen ↓</option>
+            </select>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Therapeut</th>
+              <th>Standort</th>
+              <th class="r">Wo-Std</th>
+              <th class="r">Umsatz</th>
+              <th class="r">Plan</th>
+              <th class="r">Beh.</th>
+              <th class="r">€ / Stunde</th>
+              <th style="min-width:100px"></th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+        <div class="tl">
+          <span><span class="tw" style="background:var(--red)"></span>&lt;56 €/h</span>
+          <span><span class="tw" style="background:#c77f1a"></span>56–65</span>
+          <span><span class="tw" style="background:#00907a"></span>&gt;65</span>
+        </div>
+      </div>
+
+      <div id="sec-kranken"></div>
+      <div class="st" data-toggle-section>🏥 Krankenstand <span class="st-arrow">▼</span></div>
+      <div id="krankenDiv"></div>
+
+      <div id="sec-bwa"></div>
+      <div class="st" data-toggle-section>BWA · Gewinn & Verlust <span class="st-arrow">▼</span></div>
+      <div class="g2" id="bwaDiv"></div>
+
+      <div id="sec-cf"></div>
+      <div class="st" data-toggle-section>Cashflow · Bankkonten <span class="st-arrow">▼</span></div>
+      <div class="g2" id="cfDiv"></div>
+
+      <div id="sec-liq"></div>
+      <div class="st" data-toggle-section>💰 Liquiditäts-Cockpit <span class="st-arrow">▼</span></div>
+      <div id="liqCockpit"></div>
+
+      <div class="ft" id="ftTxt">BM Group · 2026</div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+// TEMPLATE: So migrierst du eine Render-Funktion vom Original-Code in dieses Modul.
+//
+// Schritt 1: Original-Funktion (z.B. rFC) kopieren in den export.
+// Schritt 2: Folgende Such-Ersetzen-Operationen durchführen:
+//
+//    D.                      →  state.data.
+//    aM                      →  state.activeMonth
+//    aS                      →  state.activeStandort
+//    matchS(                 →  matchStandort(
+//    getWhM(                 →  getWorkingHoursMonth(
+//    getWhW(                 →  getWorkingHoursWeek(
+//    selectedAuslKW          →  state.selectedAuslKW
+//
+// Schritt 3: getActiveMonths() — direkt verwendbar
+// Schritt 4: getBWA, sumBWA, getBWAMonths — schon importiert
+// Schritt 5: getPlanForMonths, getPlanTherapist usw. — schon importiert
+// Schritt 6: fm, fmK, sn — schon importiert
+//
+// Schritt 7: Inline-onclick="..." durch addEventListener ersetzen
+//   <button onclick="setFCMode('einnahmen',this)">  →  <button data-mode="einnahmen">
+//   und in der Funktion: querySelectorAll('[data-mode]').forEach(b => b.addEventListener(...))
+//
+// Schritt 8: Alle Funktionen, die die Render-Funktion intern aufruft (z.B. renderCumulativeChart, setFCMode)
+//   in derselben Datei behalten oder in ein Helper-Modul auslagern.

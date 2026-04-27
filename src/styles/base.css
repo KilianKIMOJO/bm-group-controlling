@@ -1,0 +1,83 @@
+/* CSS-Variablen (Farben, Radien, Schatten) */
+:root {
+  --red: #C03B35;
+  --red-bg: rgba(192,59,53,.08);
+  --red-hover: #a3302c;
+  --dark: #020101;
+  --bg: #fdfaf8;
+  --card: #fff;
+  --muted: #777;
+  --border: #eaeaea;
+  --teal: #00bfa6;
+  --teal-bg: rgba(0,191,166,.08);
+  --radius: 24px;
+  --shadow: 0 10px 30px rgba(0,0,0,.03);
+  --blue: #3b82f6;
+  --blue-bg: rgba(59,130,246,.08);
+}
+
+/* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { overflow-x: hidden; width: 100%; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Login-Screen */
+#lo {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.lb { text-align: center; width: 400px; max-width: 92vw; }
+.lb h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(32px, 8vw, 42px);
+  font-weight: 900;
+  color: var(--red);
+  margin-bottom: 4px;
+  letter-spacing: -.03em;
+}
+.lb p { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+.l-btn {
+  width: 100%; padding: 16px;
+  border: none; border-radius: 100px;
+  background: var(--red); color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; letter-spacing: .3px;
+  transition: all .3s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.l-btn:hover { background: var(--red-hover); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(192,59,53,.3); }
+.l-btn svg { width: 20px; height: 20px; }
+.l-err { color: var(--red); font-size: 13px; margin-top: 12px; font-weight: 600; }
+
+/* Loading */
+.loading {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9998;
+}
+.loading.h { display: none; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { color: var(--muted); font-size: 14px; }
+
+/* Dashboard-Container */
+#db { display: none; padding: 32px 24px; overflow-x: hidden; }
+.mx { max-width: 1200px; margin: 0 auto; padding-left: 60px; }
