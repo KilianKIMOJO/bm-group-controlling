@@ -16,14 +16,12 @@ import { parseKrankenstand, parseRechnungen } from './parsers/krankenstand.js';
 import { buildNameMap } from './helpers/plan-match.js';
 import { getCurrentKW } from './helpers/months.js';
 
-/**
- * Hauptfunktion: lädt alles parallel und befüllt state.data.*.
- * @param {(text: string) => void} progress  Callback für Lade-Status-Anzeige.
- */
+// Hilfsfunktion: wickelt eine Promise-Kette in einen "darf scheitern"-Wrapper
+const safe = (p) => p.catch((e) => { console.warn('Loader (ignoriert):', e); return null; });
+
 export async function loadAll(progress = () => {}) {
   progress('Verbinde…');
 
-  // Site- und Drive-IDs
   const siteId = await getSiteId(SITE.host, SITE.path);
   state.driveId = await getDriveId(siteId);
   if (!state.driveId) throw new Error('KIMOJO-Drive konnte nicht aufgelöst werden');
@@ -38,57 +36,56 @@ export async function loadAll(progress = () => {}) {
 
   progress('Lade alle Daten parallel…');
 
-  // ─── Parallel-Loads vorbereiten ───
   const dK = state.driveId;
-  const dP = state.phfipDriveId; // kann null sein
+  const dP = state.phfipDriveId;
 
-  const bwaKSheetsP = getSheetNames(dK, FILES.bwaK);
-  const bwaPSheetsP = getSheetNames(dK, FILES.bwaP);
-
-  const ctrlP = getSheet(dK, FILES.kpi, 'Teams');
+  // alle Calls in safe(...) gewickelt – einzelne 404 brechen NICHT den ganzen Loader
+  const bwaKSheetsP   = safe(getSheetNames(dK, FILES.bwaK));
+  const bwaPSheetsP   = safe(getSheetNames(dK, FILES.bwaP));
+  const ctrlP         = safe(getSheet(dK, FILES.kpi, 'Teams'));
 
   const medifoxP = [
     { file: FILES.medifoxF1, filiale: 'KIMOJO #1' },
     { file: FILES.medifoxF2, filiale: 'KIMOJO #2' },
     { file: FILES.medifoxF3, filiale: 'KIMOJO #3' },
     { file: FILES.medifoxF4, filiale: 'PHFIP' }
-  ].map(m => getSheet(dK, m.file, 'Export')
-    .then(d => ({ d, filiale: m.filiale }))
-    .catch(() => ({ d: null, filiale: m.filiale })));
+  ].map(m => safe(getSheet(dK, m.file, 'Export')).then(d => ({ d, filiale: m.filiale })));
 
-  const bankKP = loadBank(dK, FILES.bankK);
-  const bankPP = loadBank(dK, FILES.bankP);
+  const bankKP = safe(loadBank(dK, FILES.bankK));
+  const bankPP = safe(loadBank(dK, FILES.bankP));
 
-  const planDashKP = getSheet(dK, FILES.planK, 'Dashboard 2026').catch(() => null);
-  const planEinKP  = getSheet(dK, FILES.planK, 'Planeinnahmen').catch(() => null);
-  const planKSheetsP = getSheetNames(dK, FILES.planK).catch(() => []);
-  const planDashPP = getSheet(dK, FILES.planP, 'Dashboard').catch(() => null);
-  const planEinPP  = getSheet(dK, FILES.planP, 'Planeinnahmen').catch(() => null);
-  const planPSheetsP = getSheetNames(dK, FILES.planP).catch(() => []);
+  const planDashKP = safe(getSheet(dK, FILES.planK, 'Dashboard 2026'));
+  const planEinKP  = safe(getSheet(dK, FILES.planK, 'Planeinnahmen'));
+  const planKSheetsP = safe(getSheetNames(dK, FILES.planK));
+  const planDashPP = safe(getSheet(dK, FILES.planP, 'Dashboard'));
+  const planEinPP  = safe(getSheet(dK, FILES.planP, 'Planeinnahmen'));
+  const planPSheetsP = safe(getSheetNames(dK, FILES.planP));
 
-  const auslKP = getUsedRange(dK, FILES.kpi, 'Auslastung').catch(() => null);
+  const auslKP = safe(getUsedRange(dK, FILES.kpi, 'Auslastung'));
   const auslPP = dP
-    ? getUsedRange(dP, KPI_PHFIP_ID, 'Auslastung').catch(() => null)
+    ? safe(getUsedRange(dP, KPI_PHFIP_ID, 'Auslastung'))
     : Promise.resolve(null);
 
-  const rechnungenP = getSheetNames(dK, FILES.rechnungen)
-    .then(sheets => getSheet(dK, FILES.rechnungen, sheets[0] || 'Tabelle1'))
-    .catch(() => null);
-
-  const krankenstandP   = getSheet(dK, FILES.krankenstand, 'Export').catch(() => null);
-  const krankenstandTWP = getSheet(dK, FILES.krankenstand, 'TageWoche').catch(() => null);
+ // Rechnungen-Datei vorerst deaktiviert (404 in SharePoint)
+  const rechnungenP = Promise.resolve(null);
+  const krankenstandP   = safe(getSheet(dK, FILES.krankenstand, 'Export'));
+  const krankenstandTWP = safe(getSheet(dK, FILES.krankenstand, 'TageWoche'));
 
   // ─── BWA verarbeiten ───
   progress('Verarbeite BWA…');
   const [bwaKSheets, bwaPSheets] = await Promise.all([bwaKSheetsP, bwaPSheetsP]);
 
   state.data.bwaK = {};
-  const bwaKLoads = (bwaKSheets || []).map(s => getSheet(dK, FILES.bwaK, s).then(d => ({ s, d })).catch(() => ({ s, d: null })));
-  (await Promise.all(bwaKLoads)).forEach(({ s, d }) => { if (d) state.data.bwaK[s] = parseBWA(d); });
+  if (bwaKSheets && bwaKSheets.length) {
+    const bwaKLoads = bwaKSheets.map(s => safe(getSheet(dK, FILES.bwaK, s)).then(d => ({ s, d })));
+    (await Promise.all(bwaKLoads)).forEach(({ s, d }) => { if (d) state.data.bwaK[s] = parseBWA(d); });
+  }
 
   state.data.bwaP = {};
-  const bwaPLoads = (bwaPSheets || []).map(s => getSheet(dK, FILES.bwaP, s).then(d => ({ s, d })).catch(() => ({ s, d: null })));
-  (await Promise.all(bwaPLoads)).forEach(({ s, d }) => { if (d) state.data.bwaP[s] = parseBWA(d); });
+  if (bwaPSheets && bwaPSheets.length) {
+    const bwaPLoads = bwaPSheets.map(s => safe(getSheet(dK, FILES.bwaP, s)).then(d => ({ s, d })));
+    (await Promise.all(bwaPLoads)).forEach(({ s, d }) => { if (d) state.data.bwaP[s] = parseBWA(d); });
+  }
 
   // ─── Bank ───
   progress('Verarbeite Umsatzdaten…');
@@ -96,11 +93,11 @@ export async function loadAll(progress = () => {}) {
   state.data.bankK = bankK || {};
   state.data.bankP = bankP || {};
 
-  // ─── Therapeuten-Stammdaten ───
+  // ─── Therapeuten ───
   const ctrl = await ctrlP;
   if (ctrl) state.data.ctrl = parseCtrl(ctrl);
 
-  // ─── Medifox (Roh-Umsätze) ───
+  // ─── Medifox ───
   const medifoxResults = await Promise.all(medifoxP);
   let allRaw = [];
   medifoxResults.forEach(({ d, filiale }) => {
@@ -113,7 +110,6 @@ export async function loadAll(progress = () => {}) {
   if (allRaw.length > 0) {
     state.data.raw = allRaw;
   } else {
-    // Fallback: KPI-Excel "Rohdaten Umsatz"
     try {
       const raw = await getSheet(dK, FILES.kpi, 'Rohdaten Umsatz');
       if (raw) {
@@ -133,7 +129,7 @@ export async function loadAll(progress = () => {}) {
     const planKSheets = await planKSheetsP;
     const planAusKName = (planKSheets || []).find(s => s.trim().toLowerCase() === 'planausgaben');
     if (planAusKName) {
-      const planAusK = await getSheet(dK, FILES.planK, planAusKName);
+      const planAusK = await safe(getSheet(dK, FILES.planK, planAusKName));
       if (planAusK) state.data.planK.ausgaben = parsePlanAusgaben(planAusK);
     }
   } catch (e) { console.warn('Plan KIMOJO:', e); }
@@ -147,7 +143,7 @@ export async function loadAll(progress = () => {}) {
     const planPSheets = await planPSheetsP;
     const planAusPName = (planPSheets || []).find(s => s.trim().toLowerCase() === 'planausgaben');
     if (planAusPName) {
-      const planAusP = await getSheet(dK, FILES.planP, planAusPName);
+      const planAusP = await safe(getSheet(dK, FILES.planP, planAusPName));
       if (planAusP) state.data.planP.ausgaben = parsePlanAusgaben(planAusP);
     }
   } catch (e) { console.warn('Plan PHFIP:', e); }
@@ -159,15 +155,25 @@ export async function loadAll(progress = () => {}) {
   if (auslPR && auslPR.values) state.data.auslP = parseAuslastungSheet(auslPR.values);
 
   // ─── Rechnungen ───
-  const rechnungenData = await rechnungenP;
-  state.data.rechnungen = parseRechnungen(rechnungenData);
+  try {
+    const rechnungenData = await rechnungenP;
+    state.data.rechnungen = parseRechnungen(rechnungenData);
+  } catch (e) {
+    console.warn('Rechnungen:', e);
+    state.data.rechnungen = { total: 0, count: 0, byType: {}, byPrefix: {} };
+  }
 
   // ─── Krankenstand ───
-  const ksData = await krankenstandP;
-  const ksTW = await krankenstandTWP;
-  state.data.krankenstand = parseKrankenstand(ksData, ksTW);
+  try {
+    const ksData = await krankenstandP;
+    const ksTW = await krankenstandTWP;
+    state.data.krankenstand = parseKrankenstand(ksData, ksTW);
+  } catch (e) {
+    console.warn('Krankenstand:', e);
+    state.data.krankenstand = { byMA: [], tageWoche: {}, total: 0, basePlan: 15 };
+  }
 
-  // ─── Initiale KW für Auslastungs-Anzeige ───
+  // ─── Initiale KW ───
   const allAuslKWs = [
     ...(state.data.auslK || []).map(d => d.kw),
     ...(state.data.auslP || []).map(d => d.kw)
@@ -175,8 +181,10 @@ export async function loadAll(progress = () => {}) {
   const curKW = getCurrentKW();
   state.selectedAuslKW = Math.min(curKW - 1, allAuslKWs.length ? Math.max(...allAuslKWs) : curKW - 1);
 
-  // ─── Name-Mapping für Therapeuten anwenden ───
+  // ─── Name-Mapping ───
   progress('Aufbau…');
-  buildNameMap();
-  state.data.raw.forEach(r => { if (state.nameMap[r.name]) r.name = state.nameMap[r.name]; });
+  if (state.data.raw && state.data.raw.length && state.data.ctrl && state.data.ctrl.length) {
+    buildNameMap();
+    state.data.raw.forEach(r => { if (state.nameMap[r.name]) r.name = state.nameMap[r.name]; });
+  }
 }
